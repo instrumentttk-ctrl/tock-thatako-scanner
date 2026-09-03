@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Stock Thatako Lab - QR Scanner</title>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    .scanner-card {
+      background: white;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.08);
+    }
+
+    #reader {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+
+    .status {
+      margin-top: 15px;
+      padding: 14px;
+      border-radius: 12px;
+      background: #eef2ff;
+      text-align: center;
+    }
+
+    .success {
+      background: #ecfdf5;
+      color: #166534;
+    }
+
+    .lot {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 15px;
+      border: 0;
+      border-radius: 12px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>📷 สแกน QR น้ำยา</h2>
+  <p class="subtitle">Stock Thatako Lab</p>
+
+  <div class="scanner-card">
+
+    <div id="reader"></div>
+
+    <div id="status" class="status">
+      กำลังเตรียมกล้อง...
+    </div>
+
+    <button onclick="startScanner()">
+      เปิดกล้อง
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  let scanner = null;
+  let scanned = false;
+
+
+  function startScanner() {
+
+    scanned = false;
+
+    document.getElementById("status").className =
+      "status";
+
+    document.getElementById("status").innerHTML =
+      "กำลังเปิดกล้อง...";
+
+
+    scanner =
+      new Html5Qrcode("reader");
+
+
+    const config = {
+
+      fps: 10,
+
+      qrbox: {
+        width: 250,
+        height: 250
+      },
+
+      aspectRatio: 1.0
+    };
+
+
+    scanner.start(
+
+      {
+        facingMode: {
+          exact: "environment"
+        }
+      },
+
+      config,
+
+      function(decodedText) {
+
+        if (scanned) return;
+
+        scanned = true;
+
+
+        const value =
+          String(decodedText)
+            .trim()
+            .toUpperCase();
+
+
+        document.getElementById("status").className =
+          "status success";
+
+
+        document.getElementById("status").innerHTML =
+          "✅ อ่าน QR สำเร็จ" +
+          '<div class="lot">' +
+          value +
+          "</div>";
+
+
+        scanner.stop()
+          .catch(function() {});
+
+      },
+
+      function() {
+        // กำลังค้นหา QR
+      }
+
+    )
+
+    .catch(function(error) {
+
+      document.getElementById("status").className =
+        "status";
+
+
+      document.getElementById("status").innerHTML =
+        "❌ เปิดกล้องไม่สำเร็จ<br>" +
+        error;
+
+    });
+
+  }
+
+
+  window.addEventListener(
+    "load",
+    startScanner
+  );
+
+</script>
+
+</body>
+</html>
